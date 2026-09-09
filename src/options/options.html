@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questlog Telemetry Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <span class="icon">⚔</span>
+        <h1>QUESTLOG</h1>
+      </div>
+      <p class="subtitle">Browser Telemetry Configuration</p>
+    </header>
+
+    <main class="content">
+      <!-- Backend Daemon Settings -->
+      <section class="card">
+        <h2>Backend Daemon Connection</h2>
+        <div class="form-group">
+          <label for="backend-url">FastAPI Endpoint URL</label>
+          <input type="url" id="backend-url" placeholder="http://127.0.0.1:8000" />
+          <p class="help-text">Default: http://127.0.0.1:8000</p>
+        </div>
+
+        <div class="form-group">
+          <label for="auth-token">User Bearer Token (Optional)</label>
+          <input type="password" id="auth-token" placeholder="JWT Token from desktop client or /auth/login" />
+          <p class="help-text">Leave blank if connecting over local trusted loopback.</p>
+        </div>
+
+        <div class="button-row">
+          <button id="btn-test" class="btn btn-secondary">Test Connection</button>
+          <span id="test-result" class="test-result"></span>
+        </div>
+      </section>
+
+      <!-- Privacy & Exclusions -->
+      <section class="card">
+        <h2>Privacy &amp; Domain Exclusions</h2>
+        <p class="section-desc">
+          Domains listed here will never be tracked or transmitted to the backend.
+        </p>
+
+        <div class="form-group">
+          <label for="excluded-domains">Excluded Domains (one per line or comma-separated)</label>
+          <textarea id="excluded-domains" rows="5" placeholder="bank.com&#10;internal.company.com&#10;healthcare.gov"></textarea>
+        </div>
+      </section>
+
+      <!-- Local Queue Management -->
+      <section class="card">
+        <h2>Local Telemetry Queue</h2>
+        <p class="section-desc">
+          Locally buffered browsing activities awaiting synchronization with the server.
+        </p>
+        <div class="button-row">
+          <button id="btn-clear-queue" class="btn btn-danger">Clear Local Queue</button>
+          <span id="queue-status" class="test-result"></span>
+        </div>
+      </section>
+
+      <!-- Save Bar -->
+      <div class="save-bar">
+        <button id="btn-save" class="btn btn-primary">Save Settings</button>
+        <span id="save-msg" class="save-msg"></span>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="options.ts"></script>
+</body>
+</html>

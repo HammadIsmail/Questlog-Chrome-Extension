@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questlog Web Telemetry</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="icon">⚔</span>
+        <span class="brand">QUESTLOG</span>
+      </div>
+      <div class="status-indicator" id="status-dot">
+        <span class="dot"></span>
+        <span class="status-text" id="status-text">Active</span>
+      </div>
+    </header>
+
+    <!-- Active Domain Card -->
+    <section class="card active-card">
+      <div class="card-label">CURRENT DOMAIN</div>
+      <div class="domain-title" id="current-domain">Not Tracking</div>
+      <div class="domain-details">
+        <span class="badge" id="category-badge">Idle</span>
+        <span class="timer" id="session-timer">00:00</span>
+      </div>
+    </section>
+
+    <!-- Telemetry Queue & Daemon Status -->
+    <section class="card info-card">
+      <div class="info-row">
+        <span class="info-label">Queued Events:</span>
+        <span class="info-value" id="queue-count">0</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Backend Daemon:</span>
+        <span class="info-value" id="daemon-status">Checking...</span>
+      </div>
+    </section>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <button id="btn-sync" class="btn btn-primary">Sync Now</button>
+      <button id="btn-toggle" class="btn btn-secondary">Pause Tracking</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span class="sync-msg" id="sync-msg"></span>
+      <a href="#" id="link-options" class="link-settings">⚙ Options</a>
+    </footer>
+  </div>
+
+  <script type="module" src="popup.ts"></script>
+</body>
+</html>

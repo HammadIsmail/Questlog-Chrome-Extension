@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Questlog — Real-Life Dungeon Master Web Tracker",
+  "version": "1.0.0",
+  "description": "Automatic web domain telemetry, privacy-preserving tracking, and sync for Real-Life Dungeon Master.",
+  "permissions": [
+    "tabs",
+    "idle",
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Questlog Web Telemetry",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  }
+}
