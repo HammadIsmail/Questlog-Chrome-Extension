@@ -10,7 +10,6 @@ A lightweight, privacy-preserving **Manifest V3** browser extension for **Real-L
 |---|---|
 | 🗄️ [Questlog-Backend](https://github.com/HammadIsmail/Questlog-Backend) | FastAPI backend — AI, scoring, scheduling, and REST API |
 | 🖥️ [Questlog-Desktop-App](https://github.com/HammadIsmail/Questlog-Desktop-App) | WPF Windows desktop client with Win32 telemetry |
-| 🧩 **[Questlog-Chrome-Extension](https://github.com/HammadIsmail/Questlog-Chrome-Extension)** ← *you are here* | This repo — Manifest V3 browser extension |
 
 ---
 
