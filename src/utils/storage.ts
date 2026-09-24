@@ -15,14 +15,18 @@ export interface BrowserActivityItem {
 export interface ExtensionConfig {
   backendUrl: string;
   authToken: string;
+  userEmail?: string;
+  userName?: string;
   isTrackingEnabled: boolean;
   excludedDomains: string[];
   userOverrides: Record<string, { category: string; isProductive: boolean }>;
 }
 
 export const DEFAULT_CONFIG: ExtensionConfig = {
-  backendUrl: "http://127.0.0.1:8000",
+  backendUrl: "https://questlog-backend-pi.vercel.app",
   authToken: "",
+  userEmail: "",
+  userName: "",
   isTrackingEnabled: true,
   excludedDomains: ["localhost", "127.0.0.1"],
   userOverrides: {},

@@ -44,6 +44,32 @@ async function endCurrentSession() {
   currentSession = null;
 }
 
+/**
+ * Periodically captures elapsed time for continuous sessions so
+ * activity isn't lost if the user stays on one tab for hours.
+ */
+async function snapshotActiveSession() {
+  if (!currentSession) return;
+
+  const now = Date.now();
+  const durationSeconds = Math.round((now - currentSession.startTime) / 1000);
+
+  if (durationSeconds >= 30) {
+    const activity: BrowserActivityItem = {
+      app_name: "Google Chrome",
+      window_title: `${currentSession.domain} — ${currentSession.title}`,
+      category: currentSession.category,
+      start_time: new Date(currentSession.startTime).toISOString(),
+      end_time: new Date(now).toISOString(),
+      duration_seconds: durationSeconds,
+      is_productive: currentSession.isProductive,
+    };
+
+    await enqueueActivity(activity);
+    currentSession.startTime = now; // reset slice start time
+  }
+}
+
 async function handleTabChange(tabId: number) {
   const config = await getConfig();
   if (!config.isTrackingEnabled || isUserIdle) {
@@ -64,13 +90,13 @@ async function handleTabChange(tabId: number) {
       return;
     }
 
-    // Check domain exclusions (e.g. banking sites)
+    // Check domain exclusions
     if (config.excludedDomains.some((ex) => domain === ex || domain.endsWith("." + ex))) {
       await endCurrentSession();
       return;
     }
 
-    // If same domain, don't restart session
+    // If same domain, just update title and continue session
     if (currentSession && currentSession.domain === domain) {
       currentSession.title = tab.title || domain;
       return;
@@ -93,6 +119,29 @@ async function handleTabChange(tabId: number) {
   }
 }
 
+async function getOrInitActiveTabSession(): Promise<ActiveSession | null> {
+  const config = await getConfig();
+  if (!config.isTrackingEnabled || isUserIdle) {
+    return null;
+  }
+
+  try {
+    const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    if (tabs.length > 0 && tabs[0].id && tabs[0].url) {
+      const domain = extractDomain(tabs[0].url);
+      if (domain) {
+        if (!currentSession || currentSession.domain !== domain) {
+          await handleTabChange(tabs[0].id);
+        }
+      }
+    }
+  } catch {
+    // Keep currentSession
+  }
+
+  return currentSession;
+}
+
 // ──────── CHROME EVENT LISTENERS ────────
 
 // Tab activated (switched tabs)
@@ -110,10 +159,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 // Window focus changed
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
   if (windowId === chrome.windows.WINDOW_ID_NONE) {
-    // Browser lost focus
     await endCurrentSession();
   } else {
-    // Browser regained focus
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tabs.length > 0 && tabs[0].id) {
       handleTabChange(tabs[0].id);
@@ -140,24 +187,41 @@ chrome.idle.onStateChanged.addListener(async (state) => {
 chrome.alarms.create("sync_activities", { periodInMinutes: 0.5 });
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === "sync_activities") {
+    await snapshotActiveSession();
     await syncActivitiesToBackend();
   }
 });
 
+// Initial tab detection on startup/wake-up
+getOrInitActiveTabSession();
+
 // Message listener for popup communication
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === "GET_CURRENT_STATUS") {
-    sendResponse({
-      currentSession,
-      isUserIdle,
+    getOrInitActiveTabSession().then((session) => {
+      sendResponse({
+        currentSession: session,
+        isUserIdle,
+      });
     });
-    return false;
+    return true; // async response
+  }
+
+  if (message.type === "SET_ACTIVE_TAB") {
+    if (message.tabId) {
+      handleTabChange(message.tabId).then(() => {
+        sendResponse({ currentSession });
+      });
+      return true;
+    }
   }
 
   if (message.type === "SYNC_NOW") {
-    syncActivitiesToBackend().then((result) => {
+    (async () => {
+      await snapshotActiveSession();
+      const result = await syncActivitiesToBackend();
       sendResponse(result);
-    });
+    })();
     return true; // async response
   }
 

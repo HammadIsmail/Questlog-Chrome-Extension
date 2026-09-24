@@ -8,51 +8,133 @@
 </head>
 <body>
   <div class="popup-container">
-    <!-- Header -->
-    <header class="header">
-      <div class="logo">
-        <span class="icon">⚔</span>
-        <span class="brand">QUESTLOG</span>
-      </div>
-      <div class="status-indicator" id="status-dot">
-        <span class="dot"></span>
-        <span class="status-text" id="status-text">Active</span>
-      </div>
-    </header>
 
-    <!-- Active Domain Card -->
-    <section class="card active-card">
-      <div class="card-label">CURRENT DOMAIN</div>
-      <div class="domain-title" id="current-domain">Not Tracking</div>
-      <div class="domain-details">
-        <span class="badge" id="category-badge">Idle</span>
-        <span class="timer" id="session-timer">00:00</span>
-      </div>
-    </section>
+    <!-- ══════════════ 1. AUTHENTICATION VIEW (Shown when logged out) ══════════════ -->
+    <div id="auth-view" class="view-panel" style="display: none;">
+      <!-- Header -->
+      <header class="header">
+        <div class="logo">
+          <span class="icon">⚔</span>
+          <span class="brand">QUESTLOG</span>
+        </div>
+        <span class="badge badge-dim" id="auth-backend-badge">Live Cloud</span>
+      </header>
 
-    <!-- Telemetry Queue & Daemon Status -->
-    <section class="card info-card">
-      <div class="info-row">
-        <span class="info-label">Queued Events:</span>
-        <span class="info-value" id="queue-count">0</span>
+      <div class="auth-intro">
+        <h2 id="auth-title">Realm Authentication</h2>
+        <p class="auth-subtitle" id="auth-desc">Sign in to sync your web telemetry with your quest log</p>
       </div>
-      <div class="info-row">
-        <span class="info-label">Backend Daemon:</span>
-        <span class="info-value" id="daemon-status">Checking...</span>
-      </div>
-    </section>
 
-    <!-- Action Buttons -->
-    <div class="actions">
-      <button id="btn-sync" class="btn btn-primary">Sync Now</button>
-      <button id="btn-toggle" class="btn btn-secondary">Pause Tracking</button>
+      <!-- Mode Toggle Tabs -->
+      <div class="auth-tabs">
+        <button id="tab-signin" class="tab-btn active">Sign In</button>
+        <button id="tab-signup" class="tab-btn">Create Account</button>
+      </div>
+
+      <!-- Error / Status Alert Box -->
+      <div id="auth-alert" class="alert-box" style="display: none;"></div>
+
+      <!-- Form Fields -->
+      <form id="auth-form" class="auth-form">
+        <!-- Name Field (Sign Up Only) -->
+        <div class="form-group" id="group-name" style="display: none;">
+          <label for="input-name">ADVENTURER NAME</label>
+          <input type="text" id="input-name" placeholder="e.g. Shadowblade" autocomplete="name" />
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="input-email">EMAIL ADDRESS</label>
+          <input type="email" id="input-email" placeholder="adventurer@questlog.com" required autocomplete="email" />
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="input-password">PASSWORD</label>
+          <input type="password" id="input-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-auth-submit" class="btn btn-primary btn-block">
+          Enter the Realm (Sign In)
+        </button>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span>OR</span>
+        </div>
+
+        <!-- Quick Demo Guest Button -->
+        <button type="button" id="btn-quick-guest" class="btn btn-ghost btn-block">
+          ⚡ Quick Demo (Guest Adventurer)
+        </button>
+      </form>
+
+      <!-- Auth Footer Link -->
+      <footer class="footer auth-footer">
+        <a href="#" id="link-options-auth" class="link-settings">⚙ Backend Settings</a>
+      </footer>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <span class="sync-msg" id="sync-msg"></span>
-      <a href="#" id="link-options" class="link-settings">⚙ Options</a>
-    </footer>
+
+    <!-- ══════════════ 2. TRACKING VIEW (Shown when logged in) ══════════════ -->
+    <div id="tracking-view" class="view-panel" style="display: none;">
+      <!-- Header with User Profile & Logout -->
+      <header class="header">
+        <div class="logo">
+          <span class="icon">⚔</span>
+          <span class="brand">QUESTLOG</span>
+        </div>
+        <div class="user-pill">
+          <span class="user-name" id="user-display">Adventurer</span>
+          <button id="btn-logout" class="btn-logout" title="Sign Out">Sign Out</button>
+        </div>
+      </header>
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <div class="status-indicator" id="status-dot">
+          <span class="dot"></span>
+          <span class="status-text" id="status-text">Active Monitoring</span>
+        </div>
+        <span class="backend-tag" id="backend-target-text">Cloud Sync</span>
+      </div>
+
+      <!-- Active Domain Card -->
+      <section class="card active-card">
+        <div class="card-label">CURRENT DOMAIN</div>
+        <div class="domain-title" id="current-domain">Detecting Tab...</div>
+        <div class="domain-details">
+          <span class="badge" id="category-badge">Idle</span>
+          <span class="timer" id="session-timer">00:00</span>
+        </div>
+      </section>
+
+      <!-- Telemetry Queue & Daemon Status -->
+      <section class="card info-card">
+        <div class="info-row">
+          <span class="info-label">Buffered Telemetry:</span>
+          <span class="info-value" id="queue-count">0</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Backend Connection:</span>
+          <span class="info-value" id="daemon-status">Checking...</span>
+        </div>
+      </section>
+
+      <!-- Action Buttons -->
+      <div class="actions">
+        <button id="btn-sync" class="btn btn-primary">Sync Now</button>
+        <button id="btn-toggle" class="btn btn-secondary">Pause Tracking</button>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <span class="sync-msg" id="sync-msg"></span>
+        <a href="#" id="link-options-track" class="link-settings">⚙ Options</a>
+      </footer>
+    </div>
+
   </div>
 
   <script type="module" src="popup.ts"></script>
